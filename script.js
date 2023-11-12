@@ -42,19 +42,15 @@ const displayController = (() => {
 
   const setMessage = (message) => {
     messageElement.innerText = message;
-    console.log(`Setting ${message}`);
   };
 
-  const reset = () => {
-    grids.forEach((grid) => {
-      grid.innerText = "";
-    });
-  };
-
+  // Event listeners for clickable elements
   restartBtn.addEventListener("click", () => {
     gameBoard.reset();
     gameController.reset();
-    reset();
+    grids.forEach((grid) => {
+      grid.innerText = "";
+    });
     setMessage("It's Player X's turn.");
   });
 
@@ -64,7 +60,7 @@ const displayController = (() => {
     });
   });
 
-  return { updateGrid, setMessage, reset };
+  return { updateGrid, setMessage };
 })();
 
 const gameController = (function () {
