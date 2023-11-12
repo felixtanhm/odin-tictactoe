@@ -56,6 +56,7 @@ const displayController = (() => {
 
   grids.forEach((grid) => {
     grid.addEventListener("click", (e) => {
+      if (grid.innerText != "") return;
       gameController.playRound(parseInt(e.target.dataset.index));
     });
   });
