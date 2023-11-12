@@ -24,7 +24,10 @@ const gameBoard = (() => {
     return boardValues[index];
   };
 
-  const reset = () => {};
+  const reset = () => {
+    boardValues.forEach((value, index) => (boardValues[index] = ""));
+  };
+
   return { setField, getField, reset };
 })();
 
@@ -50,6 +53,7 @@ const displayController = (() => {
 
   restartBtn.addEventListener("click", () => {
     gameBoard.reset();
+    gameController.reset();
     reset();
     setMessage("It's Player X's turn.");
   });
@@ -69,30 +73,27 @@ const gameController = (function () {
   let round = 1;
 
   const playRound = (index) => {
-    currPlayer = getCurrentPlayer();
+    if (round == 9) return;
+    currPlayer = round % 2 !== 0 ? player1.getSign() : player2.getSign();
     gameBoard.setField(index, currPlayer);
     displayController.updateGrid(index, currPlayer);
-    getMessage(checkWin(index, currPlayer), currPlayer);
-    round++;
+    evalRound(checkWin(index, currPlayer), currPlayer);
+  };
+
+  const evalRound = (outcome, currPlayer) => {
+    const message = getMessage(outcome, currPlayer);
+    displayController.setMessage(message);
+    outcome ? (round = 9) : round++;
   };
 
   const getMessage = (win, currPlayer) => {
-    if (win) {
-      displayController.setMessage(
-        `Game is over! Player ${currPlayer} has won!`
-      );
-    } else if (round == 9) {
-      displayController.setMessage("Game is over! It's a draw!");
-    } else if (currPlayer == "X") {
-      displayController.setMessage(`It's Player O's turn!`);
-    } else displayController.setMessage(`It's Player X's turn!`);
+    if (win) return `Game is over! Player ${currPlayer} has won!`;
+    if (round == 9) return "Game is over! It's a draw!";
+    if (currPlayer == "X") return `It's Player O's turn!`;
+    return `It's Player X's turn!`;
   };
 
-  const getCurrentPlayer = () => {
-    return round % 2 !== 0 ? player1.getSign() : player2.getSign();
-  };
-
-  const checkWin = function (index, currPlayer) {
+  const checkWin = (index, currPlayer) => {
     const winConditions = [
       [0, 1, 2],
       [3, 4, 5],
@@ -112,8 +113,12 @@ const gameController = (function () {
         (gridIndex) => gameBoard.getField(gridIndex) == currPlayer
       )
     );
-    return winningCondition;
+    return Boolean(winningCondition);
   };
 
-  return { playRound };
+  const reset = () => {
+    round = 1;
+  };
+
+  return { playRound, reset };
 })();
